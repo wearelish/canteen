@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Canteen | Staff Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 2rem;
+        }
+        
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .order-details h4 {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .prediction-panel {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-utensils"></i> AI Canteen <span style="color:var(--text-secondary);font-size:0.9rem;font-weight:500;">| Staff</span>
+        </div>
+        <nav>
+            <a href="index.html">View Student Site</a>
+        </nav>
+    </header>
+
+    <main class="dashboard-container">
+        <section>
+            <h2>Live Orders</h2>
+            <div id="orders-list" class="orders-list" style="margin-top: 1rem;">
+                <div class="loading">Loading orders...</div>
+            </div>
+        </section>
+
+        <section>
+            <div class="prediction-panel">
+                <h3><i class="fa-solid fa-chart-line" style="color:var(--primary-color);"></i> AI Demand Prediction</h3>
+                <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem; margin-bottom: 1rem;">
+                    Based on current time and weather patterns.
+                </p>
+                <div style="background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+                    <p style="font-weight:600; margin-bottom:0.25rem;">Trending Now:</p>
+                    <ul style="padding-left:1.2rem; color:var(--text-secondary); font-size:0.9rem;">
+                        <li>Maggi (High demand expected)</li>
+                        <li>Chai (Due to rainy weather)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const ordersList = document.getElementById('orders-list');
+
+        async function fetchOrders() {
+            try {
+                const res = await fetch('/api/admin/orders');
+                const orders = await res.json();
+                renderOrders(orders);
+            } catch (err) {
+                console.error(err);
+                ordersList.innerHTML = '<div class="loading">Error loading orders</div>';
+            }
+        }
+
+        function renderOrders(orders) {
+            if (orders.length === 0) {
+                ordersList.innerHTML = '<div class="loading">No active orders right now.</div>';
+                return;
+            }
+
+            ordersList.innerHTML = '';
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                
+                // Format time
+                const date = new Date(order.created_at);
+                const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                card.innerHTML = `
+                    <div class="order-details">
+                        <h4>#${order.id} - ${order.student_name} <span class="badge ${order.status}">${order.status}</span></h4>
+                        <div class="order-meta">
+                            <span>Pickup: ${order.pickup_time.replace('_', ' ')}</span> | 
+                            <span>Payment: ${order.payment_method}</span> | 
+                            <span>Time: ${timeString}</span>
+                        </div>
+                        <p style="font-weight:600;">Total: ₹${order.total_amount}</p>
+                    </div>
+                    <div class="action-buttons">
+                        ${order.status === 'pending' ? `<button class="btn primary" onclick="updateStatus(${order.id}, 'preparing')">Prepare</button>` : ''}
+                        ${order.status === 'preparing' ? `<button class="btn" style="background:var(--success);color:white;" onclick="updateStatus(${order.id}, 'ready')">Ready</button>` : ''}
+                        ${order.status === 'ready' ? `<button class="btn" style="background:#64748b;color:white;" onclick="updateStatus(${order.id}, 'completed')">Complete</button>` : ''}
+                    </div>
+                `;
+                ordersList.appendChild(card);
+            });
+        }
+
+        async function updateStatus(id, status) {
+            try {
+                await fetch(`/api/admin/orders/${id}/status`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ status })
+                });
+                fetchOrders(); // refresh
+            } catch (err) {
+                console.error("Failed to update status", err);
+            }
+        }
+
+        // Initial fetch and poll every 10 seconds
+        fetchOrders();
+        setInterval(fetchOrders, 10000);
+    </script>
+</body>
+</html>

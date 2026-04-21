@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Canteen | Order Food</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-utensils"></i> AI Canteen
+        </div>
+        <nav>
+            <a href="index.html" class="active">Order</a>
+            <a href="staff.html">Staff Login</a>
+            <button id="cart-btn" class="cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cart-count">0</span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- AI Recommendations Banner -->
+        <section class="ai-banner">
+            <div class="ai-banner-content">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <div>
+                    <h3>AI Suggestion</h3>
+                    <p id="ai-suggestion-text">Students usually order Maggi and Cold Coffee at this time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Voice/Text Ordering -->
+        <section class="ai-ordering">
+            <h2>Quick Order via AI</h2>
+            <div class="chat-input-wrapper">
+                <input type="text" id="ai-text-input" placeholder="e.g. 'Order 1 samosa and 1 chai'">
+                <button id="voice-btn" class="icon-btn" title="Speak your order">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <button id="ai-submit-btn" class="btn primary">Send</button>
+            </div>
+            <p id="ai-status" class="status-text"></p>
+        </section>
+
+        <!-- Menu Section -->
+        <section class="menu-section">
+            <h2>Our Menu</h2>
+            <div class="category-tabs">
+                <button class="tab active" data-category="all">All</button>
+                <button class="tab" data-category="snacks">Snacks</button>
+                <button class="tab" data-category="beverages">Beverages</button>
+                <button class="tab" data-category="meals">Meals</button>
+            </div>
+            
+            <div id="menu-grid" class="menu-grid">
+                <!-- Menu items will be injected here via JS -->
+                <div class="loading">Loading menu...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Order</h2>
+                <button id="close-cart" class="close-btn"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items injected here -->
+            </div>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Total:</span>
+                    <span id="cart-total">₹0</span>
+                </div>
+                
+                <div class="checkout-form">
+                    <div class="form-group">
+                        <label for="student-name">Your Name</label>
+                        <input type="text" id="student-name" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pickup-time">Pickup Time</label>
+                        <select id="pickup-time">
+                            <option value="15_mins">In 15 minutes</option>
+                            <option value="30_mins">In 30 minutes</option>
+                            <option value="1_hour">In 1 hour</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-method">Payment Method</label>
+                        <select id="payment-method">
+                            <option value="online">Online Payment (UPI/Card)</option>
+                            <option value="cash">Cash at Counter</option>
+                        </select>
+                    </div>
+                    <button id="checkout-btn" class="btn primary full-width">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+node_modules/
+canteen.db
+.env
+.DS_Store
